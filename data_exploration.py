@@ -3,6 +3,10 @@ import openpyxl
 import matplotlib.pyplot as plt
 import math
 
+FILENAMES = [
+    '2018_11_07_all_ward',
+    '2020_04_07_all_ward'
+]
 df1 = pd.read_excel('data/2018_11_06_absentee_county.xlsx')
 
 df1.head()
@@ -70,3 +74,7 @@ def aggregate_absentee_data(filename):
     plt.show()
 
     df_gb.to_csv('data/' + filename + '_agg.csv', index=False)
+
+if __name__ == '__main__':
+    for fl in FILENAMES:
+        aggregate_absentee_data(fl)
