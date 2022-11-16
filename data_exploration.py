@@ -16,13 +16,7 @@ FILENAMES = [
     '2022_04_05-spring_election',
     '2022_08_09-partisan_primary'
 ]
-# df1 = pd.read_excel('data/2018_11_06_absentee_county.xlsx')
 
-# df1.head()
-
-# df2 = pd.read_excel('data/2018_11_07-general_election.xlsx')
-
-# df2.head()
 
 rdf = pd.read_csv('data/ruralurbancodes2013.csv')
 
@@ -38,14 +32,14 @@ wi_fips = wi_fips.rename(columns={'County Name': 'County', 'FIPS Code': 'FIPS'})
 def aggregate_absentee_data(filename):
     df = pd.read_excel('data/raw/' + filename + '.xlsx', engine='openpyxl')
     if 'Mililary Absentees Transmitted Issued' in df.columns:
-        df = df.rename({'Mililary Absentees Transmitted Issued': 'Military Absentees Transmitted Issued'})
+        df = df.rename(columns={'Mililary Absentees Transmitted Issued': 'Military Absentees Transmitted Issued'})
     if 'Mililary Absentees Transmitted Counted' in df.columns:
-        df = df.rename({'Mililary Absentees Transmitted Counted': 'Military Absentees Transmitted Counted'})
+        df = df.rename(columns={'Mililary Absentees Transmitted Counted': 'Military Absentees Transmitted Counted'})
     df['Election'] = filename
     df['absentees_issued'] = (
         df['In Person Absentees Issued'] + 
         df['Non UOCAVA Absentees Transmitted Issued'] +
-        df['Mililary Absentees Transmitted Issued'] +
+        df['Military Absentees Transmitted Issued'] +
         df['Temporarily Overseas Absentees Transmitted Issued'] +
         df['Permanent Overseas Absentees Transmitted Issued']
     )
@@ -53,7 +47,7 @@ def aggregate_absentee_data(filename):
     df['absentees_counted'] = (
         df['In Person Absentees Counted']  +
         df['Non UOCAVA Absentees Transmitted Counted'] +
-        df['Mililary Absentees Transmitted Counted'] +
+        df['Military Absentees Transmitted Counted'] +
         df['Temporarily Overseas Absentees Transmitted Counted'] +
         df['Permanent Overseas Absentees Transmitted Counted']
     )
@@ -74,18 +68,34 @@ def aggregate_absentee_data(filename):
     df_gb['population_1000s'] = df_gb['Population_2010']/1000
     df_gb = pd.merge(df_gb, wi_fips[['County', 'FIPS']])
 
-    # plt.scatter(
-    #     x=df_gb['RUCC_2013'], 
-    #     y=df_gb['absentee_%_of_voters'],
-    #     s=df_gb['population_1000s']
-    # )
-    # plt.show()
+    plt.scatter(
+        x=df_gb['RUCC_2013'], 
+        y=df_gb['absentee_%_of_voters'],
+        s=df_gb['population_1000s']
+    )
+    plt.show()
 
-    # plt.scatter(
-    #     x=df_gb['population_1000s'], 
-    #     y=df_gb['absentee_%_of_voters']
-    # )
-    # plt.show()
+    plt.scatter(
+        x=df_gb['population_1000s'], 
+        y=df_gb['absentee_%_of_voters'],
+        
+    )
+    plt.show()
+
+    plt.bar(
+        df_gb['population_1000s'], 
+        df_gb['absentee_%_of_voters'],
+        width=10
+    )
+    plt.show()    
+
+
+    # NEXT GRAPHS
+
+    # - Read all 10 elections and check trend over time
+    # - Aggregate by urban/rural or by population buckets & check trends over time
+    # - Check overall turnout alongside absentee; see if trends are parallel or opposite
+    # - Look at rejected ballots data - has that changed significantly over time?
 
     df_gb.to_csv('data/cleaned/' + filename + '_agg.csv', index=False)
 
